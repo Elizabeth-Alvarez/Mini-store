@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular.min.js"></script>
+   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular-route.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+    <script>
+    var myApp = angular.module('myApp', ['ngRoute']);
+
+    myApp.config(function ($routeProvider) {
+        $routeProvider
+            .when('/', {
+                templateUrl: 'partials/splash.html'
+                // templateUrl: 'partials/dashboard.html'
+            })
+            // .when('/partial1', {
+            //   templateUrl: 'partials/'
+            // })
+            .when('/partial5', {
+              templateUrl: 'partials/dashboard.html'
+            })
+            .when('/partial2', {
+                templateUrl: 'partials/products.html'
+            })
+            .when('/partial3', {
+                templateUrl: 'partials/orders.html'
+            })
+            .when('/partial4', {
+                templateUrl: 'partials/customers.html'
+            })
+            .otherwise({
+                redirectTo: '/'
+            });
+    });
+
+    ////////Creating Customer Factory && Controller////////////////////////
+    myApp.factory('customerFactory', function($http) {
+        var factory = {};
+        var customers = [];
+
+        factory.getCustomers = function(callback) {
+            $http.get('/customers').success(function(output) {
+                customers = output;
+                callback(customers);
+            })
+        }
+
+        factory.addCustomer = function(info, callback) {
+            $http.post('/addCustomers', info).success(function(output) {
+                customers.push({name: output.name, date: output.date, id: output._id});
+                callback(customers);
+            })
+        }
+
+        factory.removeCustomer = function(info) {
+            $http.post('/removeCustomers', info).success(function(output) {
+                for(var i = 0; i < customers.length; i++){
+                    if(customers[i]._id === info._id) {
+                        customers.splice(i, 1);
+                    }
+                    return;
+                }
+            })
+        }
+
+        return factory;
+    }); //Ends Factory
+
+    //Inject factory into controller
+    myApp.controller('customersController', function($scope, customerFactory, orderFactory, productFactory){
+
+        customerFactory.getCustomers(function(data) {
+            $scope.customers = data;
+        });
+
+        orderFactory.getOrders(function(data) {
+            $scope.orders = data;
+        });
+
+        productFactory.getProducts(function(data) {
+           $scope.products = data;
+       });
+
+        //adding back to the scope
+        $scope.addCustomer = function() {
+            customerFactory.addCustomer($scope.newCustomer, function(output){
+                    $scope.customers = output; //updating pre-existing scope customer from views
+                    $scope.newCustomer = {}; //clears input to allow new added input
+                });
+           }
+
+        $scope.removeCustomer = function(customer) {
+            customerFactory.removeCustomer(customer)
+        }
+
+        //Function for Products pagination
+        $scope.showData = function(){
+            var pagesShown = 1;
+            var pageSize = 4;
+
+           $scope.paginationLimit = function(data) {
+               return pageSize * pagesShown;
+           };
+           $scope.hasMoreItemsToShow = function() {
+               return pagesShown < ($scope.products.length / pageSize);
+           };
+           $scope.showMoreItems = function() {
+               pagesShown = pagesShown + 1;
+           };
+         }//End of showData()
+
+         //Function for Orders pagination
+        $scope.showOrders = function() {
+          var pagesShown = 1;
+          var pageSize = 4;
+
+           $scope.pagination = function(data) {
+             return pageSize * pagesShown;
+           };
+           $scope.showOrders = function() {
+             return pagesShown < ($scope.orders.length / pageSize);
+           };
+           $scope.hasAllOrders = function() {
+               pagesShown = pagesShown + ($scope.orders.length / pageSize);
+             };
+        } //End of showOrders()
+
+        //Function for Customers pagination
+        $scope.showCustomers = function() {
+          var pagesShown = 1;
+          var pageSize = 4;
+
+          $scope.customerPagination = function(data) {
+            return pageSize * pagesShown;
+          };
+          $scope.showCustomer = function() {
+            return pagesShown < ($scope.customers.length / pageSize);
+          };
+          $scope.hasAllCustomers = function() {
+              pagesShown = pagesShown + ($scope.customers.length / pageSize);
+          };
+        } //End of showCustomers()
+
+       }); //End of customer controller
+
+
+
+      ////Creating Order Factory && Controller/////////////////////////////////////
+      myApp.factory('orderFactory', function($http) {
+            var factory = {};
+            var orders = [{}];
+
+            factory.getOrders = function(callback) {
+                $http.get('/products').success(function(output) {
+                    orders = output;
+                    callback(orders);
+                })
+            }
+
+            factory.addOrder = function(info, callback) {
+                $http.post('/addProducts', info).success(function(output) {
+                    callback(orders);
+                })
+            }
+
+            factory.removeOrder = function(info) {
+                $http.post('/removeOrders', info).success(function(output) {
+                    for(var i = 0; i < orders.length; i++){
+                        if(orders[i]._id === info._id) {
+                            orders.splice(i, 1);
+                        }
+                        return;
+                    }
+                })
+            }
+
+            return factory
+        });
+
+        //Inject factory into controller
+        myApp.controller('ordersController', function($scope, orderFactory, customerFactory, productFactory) {
+
+            orderFactory.getOrders(function(data) {
+                $scope.orders = data;
+            });
+
+            customerFactory.getCustomers(function(data){
+                $scope.customers = data;
+            });
+
+             productFactory.getProducts(function(data) {
+                $scope.products = data;
+            });
+
+
+            $scope.addOrder = function() {
+                //customer, order #, product
+                var all = {name: $scope.newName, quantity: $scope.numberOrder, product: $scope.newOrder};
+
+                orderFactory.addOrder(all, function() {
+                    orderFactory.getOrders(function(output) {
+                    $scope.orders = output;
+                })
+                })
+            }
+
+            $scope.removeOrder = function(order) {
+                orderFactory.removeOrder(order)
+            }
+
+           });//end of controller
+
+         /////////////Creating Product factory && controller//////////////////////
+         myApp.factory('productFactory', function($http) {
+            var factory = {};
+            var products = [{}];
+
+            factory.getProducts = function(callback) {
+                $http.get('/images').success(function(output) {
+                    products = output;
+                    callback(products);
+                })
+            }
+
+            factory.addProduct = function(info, callback) {
+                $http.post('/addImages', info).success(function(output) {
+                    callback(products);
+                })
+            }
+
+            factory.removeProduct = function(info) {
+                $http.post('/removeProducts', info).success(function(output) {
+                    for(var i = 0; i < products.length; i++){
+                        if(products[i]._id === info._id) {
+                            products.splice(i, 1);
+                        }
+                        return;
+                    }
+                })
+            }
+
+            return factory
+        });
+
+        //Inject factory into controller
+        myApp.controller('productsController', function($scope, productFactory, orderFactory) {
+
+            productFactory.getProducts(function(data) {
+                $scope.products = data;
+            })
+
+            $scope.addProduct = function() {
+                productFactory.addProduct($scope.newProduct, function() {
+                    productFactory.getProducts(function(output) {
+                    $scope.products = output;
+                    // $scope.newProduct = {}; //clears input to allow new added input
+                })
+                })
+            }
+
+            $scope.removeProduct = function(product) {
+                productFactory.removeProduct(product)
+            }
+
+            //Function for pagination
+            $scope.showData = function( ){
+                var pagesShown = 1;
+                var pageSize = 4;
+
+               $scope.paginationLimit = function(data) {
+                   return pageSize * pagesShown;
+               };
+               $scope.hasMoreItemsToShow = function() {
+                   return pagesShown < ($scope.products.length / pageSize);
+               };
+               $scope.showMoreItems = function() {
+                   pagesShown = pagesShown + 1;
+               };
+             } //End of showData()
+
+
+           });//end of controller
+
+    </script>
+     <style type="text/css">
+      body {
+        /*background-color: #d8e2f9;*/
+      }
+      p {
+        font-size: 14px;
+      }
+      .jumbotron {
+        position: relative;
+        background: url('/img/basket.png') no-repeat center center;
+        height: 725px;
+        }
+        .btn_splash {
+          margin-left: 100px;
+          background-color: #3d8cd7;
+        }
+        .container link {
+          text-decoration: none;
+        }
+        h3 {
+            text-decoration: underline;
+            margin-left: 150px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        h2 {
+          margin-right: 30px;
+        }
+        .table {
+            margin-left: 150px;
+            margin-top: 30px;
+            width: 80%;
+        }
+        .header {
+            margin-top: 30px;
+            margin-left: 150px;
+        }
+        .btn-info {
+            margin-left: 90%;
+        }
+        p {
+          margin-top: 20px;
+        }
+        .btn_middle {
+          width: 200px;
+          margin-bottom: 30px;
+        }
+        .product_btn {
+          margin-right: 50px;
+        }
+        .filter_btn {
+          margin-top: 10px;
+          margin-left: 110px;
+        }
+        .input {
+          margin-left: 125px;
+        }
+        .search_filter {
+          margin-left: 1200px;
+        }
+        h4 {
+            text-decoration: underline;
+            text-align: left;
+            margin-top: 10px;
+        }
+        .images {
+            height: 150px;
+            width: 150px;
+        }
+        .pagination a {
+          cursor:pointer;
+        }
+        .product_holder {
+          border: 1px solid #62a2df;
+          margin-bottom: 20px;
+        }
+        .product_holder img {
+          margin-left: 2px;
+        }
+        .product_holder p {
+          text-align: center;
+        }
+        .product_holder input {
+          margin-left: 40px;
+        }
+    </style>
+</head>
+<body ng-app='myApp'>
+    <div>
+        <div ng-view=""></div>
+    </div>
+</body>
+</html>

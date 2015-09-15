@@ -1,0 +1,74 @@
+<div ng-controller='productsController' ng-init="showData()">
+  <div class="row header">
+    <div class="col-md-6">
+      <ul class="pagination">
+        <li><a href="#/partial5">Dashboard</a></li>
+        <li class="active"><a href="#/partial2">Products</a></li>
+        <li><a href="#/partial3">Orders</a></li>
+        <li><a href="#/partial4">Customers</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3">
+        <input type="text" ng-model="search"><br><input type="submit" value="Filter" ng-click='' class="btn btn-info filter_btn">
+          <form name="myform" novalidate>
+            <h4>Add A New Product</h4>
+            <div class="form-group">
+              <label for='name' placehoder="Enter Name">Name:</label>
+              <input typle="text" ng-model='newProduct.name' class="form-control" name='name' id='name' ng-minlength="3" ng-maxlength="10">
+              <span style="color:red" ng-show="myform.name.$error.minlength">Atleast 3 characters required</span>
+              <span style="color:red" ng-show="myform.name.$error.maxlength">No more than 10 characters!</span>
+            </div>
+
+            <div class="form-group">
+              <label for='image' placeholder="">Image:</label>
+              <input type="text" ng-model='newProduct.image' class="form-control" name='image' id='image' required>
+              <span style="color:red" ng-show="myform.image.$dirty && myform.image.$invalid"></span>
+              <span ng-show="myform.image.$error.required">Link required</span>
+            </div>
+
+            <div class="form-group">
+              <label for='description'>Description:</label>
+              <textarea ng-model='newProduct.description' class="form-control" name='description' id='name' required></textarea>
+              <span style='color:red' ng-show="myform.description.$dirty && myform.description.$invalid"></span>
+              <span ng-show="myform.description.$error.required">Description required</span>
+            </div>
+
+            <div class="form-group">
+              <label>Quantity:</label>
+              <select ng-model="newProduct.quantity">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+              </select>
+            </div>
+
+            <div class="form-group product_btn">
+              <div class="dropdown">
+                <input type="submit" value="Create" ng-click='addProduct()' class="btn btn-info" ng-disabled="myform.name.$dirty && myform.name.$invalid">
+              </div>
+            </div>
+          </form>
+      </div>
+
+      <div class="col-md-8">
+        <div class="col-md-3" ng-repeat="product in products | filter:search | limitTo: paginationLimit()">
+          <div class="product_holder">
+            <img class="images img-responsive" ng-src="{{product.img}}">
+            <p ng-bind="product.name"></p>
+            <p ng-bind="product.quantity"></p>
+            <td><input ng-click='removeProduct(product)' class="btn btn-danger" type="submit" value="Remove"></td>
+          </div>
+        </div>
+        <div class="pagination">
+          <a ng-show="hasMoreItemsToShow()" ng-click="showMoreItems()">Show More...</a>
+        </div>
+      </div>
+
+    </div>
+  </div> <!-- End of container div-->
+</div>
