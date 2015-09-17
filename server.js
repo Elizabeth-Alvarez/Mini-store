@@ -8,7 +8,8 @@ var app = express();
 require('./config/mongoose.js');
 
 var bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded());
+// app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 require('./config/routes.js')(app);
@@ -20,8 +21,3 @@ var port = Number(process.env.PORT || 8000);
 app.listen(port, function() {
   console.log('cool stuff on: 8000');
 });
-
-
-// app.listen(process.env.PORT || 8000, function(){
-//     console.log('cool stuff on: 8000');
-//   });
