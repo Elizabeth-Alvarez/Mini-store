@@ -15,13 +15,13 @@ require('./config/routes.js')(app);
 
 app.use(express.static(path.join(__dirname, './client')));
 
-// var port = Number(process.env.PORT || 8000);
+var port = Number(process.env.PORT || 8000);
 
-// app.listen(port, function() {
-//   console.log('cool stuff on: 8000');
-// });
+app.listen(port, function() {
+  console.log('cool stuff on: 8000');
+});
 
 
-app.listen(process.env.PORT || 8000, function(){
-    console.log('cool stuff on: 8000');
-  });
+// app.listen(process.env.PORT || 8000, function(){
+//     console.log('cool stuff on: 8000');
+//   });
