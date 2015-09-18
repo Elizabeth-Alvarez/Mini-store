@@ -3,10 +3,26 @@
   "version": "0.0.1",
   "dependencies": {
     "express": "~4.2.0",
-    "mongoose" : "~3.8.0",
-    "body-parser" : "~1.4.2"
+    "mongoose": "~3.8.0",
+    "body-parser": "~1.4.2"
   },
   "engines": {
-      "node": "0.12.2"
-  }
+    "node": "0.12.2"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "description": "RESTful application created using the MEAN stack with MongoDB as the database. Used Bootstrap’s grid system to show pagination to display data. This application has CRUD functionality: create, read, update, and delete. Search embedded to filter through the list of most recent add on items. Validation was added to guide the user into using all fields.",
+  "main": "server.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Elizabeth-Alvarez/Mini-store.git"
+  },
+  "author": "Elizabeth Alvarez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Elizabeth-Alvarez/Mini-store/issues"
+  },
+  "homepage": "https://github.com/Elizabeth-Alvarez/Mini-store#readme"
 }
