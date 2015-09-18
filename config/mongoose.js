@@ -6,7 +6,7 @@ var fs = require('fs');
 var uristring =
 process.env.MONGOLAB_URI ||
 process.env.MONGOHQ_URL ||
-'mongodb://locahost/picnic_list';
+'mongodb://locahost/Orders_Customers';
 
 mongoose.connect(uristring, function(err, res) {
   if(err) {
