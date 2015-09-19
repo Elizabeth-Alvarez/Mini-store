@@ -4,8 +4,8 @@ var mongoose = require('mongoose');
 var fs = require('fs');
 
 var uristring =
-process.env.MONGOLAB_URI ||
-process.env.MONGOHQ_URL ||
+// process.env.MONGOLAB_URI ||
+// process.env.MONGOHQ_URL ||
 'mongodb://localhost/Orders_Customers';
 
 mongoose.connect(uristring, function(err, res) {

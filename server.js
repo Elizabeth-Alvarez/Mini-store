@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 require('./config/routes.js')(app);
 
 app.use(express.static(path.join(__dirname, './client')));
-
+// app.use('/public',express.static(__dirname + '/public'));
 var port = Number(process.env.PORT || 8000);
 
 app.listen(port, function() {
